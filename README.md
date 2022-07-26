@@ -19,7 +19,7 @@ At its core, this projects contains a [CDK (AWS Cloud Development Kit)](https://
 ### Deploy the solution
 Clone this repository:
 ```bash
-git clone <insert link>
+git clone https://github.com/aws-samples/aws-secrets-manager-hybrid-secret-replication-from-hashicorp-vault.git
 cd SecretsManagerReplication
 ```
 
