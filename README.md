@@ -25,7 +25,10 @@ cd SecretsManagerReplication
 
 Open the project in your favorite IDE and open a terminal in the root folder of the project. If your local environment does not have a terminal that allows you to run these commands, consider using [AWS Cloud9](https://docs.aws.amazon.com/cloud9/latest/user-guide/welcome.html) or [AWS CloudShell](https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html).
 
-**Important:** You need a valid AWS Access Key ID and Secret Access Key configured, as some of the commands below will interact with your AWS account. See [Configuration basics](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) for more details.
+#### Important prerequisites
+* You need a valid AWS Access Key ID and Secret Access Key configured, as some of the commands below will interact with your AWS account. See [Configuration basics](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) for more details.
+* You need to have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed for the deployment
+
 1. Install CDK v2 by running the following command in your terminal:
 ```bash
 npm install -g aws-cdk
