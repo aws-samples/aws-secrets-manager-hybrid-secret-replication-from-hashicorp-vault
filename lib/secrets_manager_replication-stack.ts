@@ -106,6 +106,8 @@ export class SecretsManagerReplicationStack extends Stack {
       ],
     })
 
+    vpc.node.addDependency(encryptedBucket)
+
     /*
     * Determine the vault address to add to the vault connection secret.
     * This is used by AWS Lambda to connect to the vault.
