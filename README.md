@@ -16,7 +16,7 @@ At its core, this projects contains a [CDK (AWS Cloud Development Kit)](https://
 * An AWS KMS key for encryption of secrets
 * An optional Amazon SNS topic for email notifications if replication fails
 
-**Note:** Depending on the location of your third-party secrets manager, you may have to consider different networking topologies. For example, you might need to setup a hybrid connection between your on-premises secrets manager and the AWS Cloud if there is no connectivity yet. Although the communication between the replication service shown in this blog post and the third-party secrets manager is encrypted using TLS, AWS customers typically setup a hybrid connectivity between their on-premises environment and the AWS Cloud using [AWS Site-to-Site VPN](https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html), and/or [AWS Direct Connect](https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html).
+**Note:** Depending on the location of your third-party secrets manager, you may have to consider different networking topologies. For example, you might need to setup a hybrid connection between your on-premises secrets manager and the AWS Cloud if there is no connectivity yet. Although the communication between the replication service shown in this sample and the third-party secrets manager is encrypted using TLS, AWS customers typically setup a hybrid connectivity between their on-premises environment and the AWS Cloud using [AWS Site-to-Site VPN](https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html), and/or [AWS Direct Connect](https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html).
 
 ## Getting started
 ### Deploy the solution
@@ -156,7 +156,6 @@ You can run the tests by running the following command in your terminal:
 ```bash
 npm run test
 ```
-
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
