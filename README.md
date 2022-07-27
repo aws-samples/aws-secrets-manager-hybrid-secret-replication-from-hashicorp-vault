@@ -6,15 +6,15 @@ This sample shows you how you can use your third-party secrets manager as the so
 ## DISCLAIMER
 The sample code; software libraries; command line tools; proofs of concept; templates; or other related technology (including any of the foregoing that are provided by our personnel) is provided to you as AWS Content under the AWS Customer Agreement, or the relevant written agreement between you and AWS (whichever applies). You should not use this AWS Content in your production accounts, or on production or other critical data. You are responsible for testing, securing, and optimizing the AWS Content, such as sample code, as appropriate for production grade use based on your specific quality control practices and standards. Deploying AWS Content may incur AWS charges for creating or using AWS chargeable resources, such as running Amazon EC2 instances or using Amazon S3 storage.
 ## Architecture
+![secrets-manager-arch](assets/1-secrets-replication-architecture.png)
+
 At its core, this projects contains a [CDK (AWS Cloud Development Kit)](https://aws.amazon.com/cdk/) script which deploys the following:
-* An Amazon EC2 instance running an open-source HashiCorp Vault. You will have access the HCP Vault UI running on the instance to add, update and delete secrets
+* An Amazon EC2 instance running a demo open-source HashiCorp Vault (3B). You will have access the HCP Vault UI running on the instance to add, update and delete secrets. Adjust the `cdk.json` file if you want to specify your own HCP Vault IP address (3A). 
 * An initialisation script which sets up the HashiCorp Vault, and adds some sample secrets to it
 * An AWS Lambda function which replicates any new or updated secrets from HashiCorp Vault matching a particular prefix to AWS Secrets Manager
 * A Cron Job in Amazon EventBridge which triggers the Lambda function periodically (default: every 30 minutes)
 * An AWS KMS key for encryption of secrets
 * An optional Amazon SNS topic for email notifications if replication fails
-
-![secrets-manager-arch](assets/1-secrets-replication-architecture.png)
 
 **Note:** Depending on the location of your third-party secrets manager, you may have to consider different networking topologies. For example, you might need to setup a hybrid connection between your on-premises secrets manager and the AWS Cloud if there is no connectivity yet. Although the communication between the replication service shown in this blog post and the third-party secrets manager is encrypted using TLS, AWS customers typically setup a hybrid connectivity between their on-premises environment and the AWS Cloud using [AWS Site-to-Site VPN](https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html), and/or [AWS Direct Connect](https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html).
 
