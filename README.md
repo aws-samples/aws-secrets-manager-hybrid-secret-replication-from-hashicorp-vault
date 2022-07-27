@@ -1,6 +1,7 @@
 # How to set up continuous replication from your third-party secrets manager to AWS Secrets Manager
-
 This sample shows you how you can use your third-party secrets manager as the source of truth for your secrets, whilst replicating a subset of these secrets to AWS Secrets Manager. By doing this, you will be able to use secrets originating and managed from your third-party secrets manager in AWS Cloud applications or in AWS Services that use Secrets Manager secrets. **This sample uses [HashiCorp Vault](https://www.vaultproject.io/) as third-party secrets manager**.
+
+**Important:** This sample is intended to provide guidance on how you could approach implementing a secrets replication mechanism. **This sample is not intended to be run directly in production** and your security risk appetite and hardening requirements will need to be taken into consideration. As an example, HashiCorp provides tutorials on [hardening production vaults](https://learn.hashicorp.com/tutorials/vault/production-hardening).
 
 ## DISCLAIMER
 The sample code; software libraries; command line tools; proofs of concept; templates; or other related technology (including any of the foregoing that are provided by our personnel) is provided to you as AWS Content under the AWS Customer Agreement, or the relevant written agreement between you and AWS (whichever applies). You should not use this AWS Content in your production accounts, or on production or other critical data. You are responsible for testing, securing, and optimizing the AWS Content, such as sample code, as appropriate for production grade use based on your specific quality control practices and standards. Deploying AWS Content may incur AWS charges for creating or using AWS chargeable resources, such as running Amazon EC2 instances or using Amazon S3 storage.
@@ -14,6 +15,8 @@ At its core, this projects contains a [CDK (AWS Cloud Development Kit)](https://
 * An optional Amazon SNS topic for email notifications if replication fails
 
 ![secrets-manager-arch](assets/1-secrets-replication-architecture.png)
+
+**Note:** Depending on the location of your third-party secrets manager, you may have to consider different networking topologies. For example, you might need to setup a hybrid connection between your on-premises secrets manager and the AWS Cloud if there is no connectivity yet. Although the communication between the replication service shown in this blog post and the third-party secrets manager is encrypted using TLS, AWS customers typically setup a hybrid connectivity between their on-premises environment and the AWS Cloud using [AWS Site-to-Site VPN](https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html), and/or [AWS Direct Connect](https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html).
 
 ## Getting started
 ### Deploy the solution
