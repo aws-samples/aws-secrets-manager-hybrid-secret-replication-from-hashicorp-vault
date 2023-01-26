@@ -1,7 +1,7 @@
-# How to set up continuous replication from your third-party secrets manager to AWS Secrets Manager
+# How to set up ongoing replication from your third-party secrets manager to AWS Secrets Manager
 This sample shows you how you can use your third-party secrets manager as the source of truth for your secrets, whilst replicating a subset of these secrets to AWS Secrets Manager. By doing this, you will be able to use secrets originating and managed from your third-party secrets manager in AWS Cloud applications or in AWS Services that use Secrets Manager secrets. **This sample uses [HashiCorp Vault](https://www.vaultproject.io/) as third-party secrets manager**.
 
-**Important:** This sample is intended to provide guidance on how you could approach implementing a secrets replication mechanism. **This sample is not intended to be run directly in production** and your security risk appetite and hardening requirements will need to be taken into consideration. As an example, HashiCorp provides tutorials on [hardening production vaults](https://learn.hashicorp.com/tutorials/vault/production-hardening).
+**Important:** This sample is intended to provide guidance that you can use when planning and implementing a secrets replication mechanism. This sample is not intended to be run directly in production, and you will need to take security hardening requirements into consideration before deploying this solution. As an example, HashiCorp provides tutorials on [hardening production vaults](https://learn.hashicorp.com/tutorials/vault/production-hardening).
 
 ## DISCLAIMER
 The sample code; software libraries; command line tools; proofs of concept; templates; or other related technology (including any of the foregoing that are provided by our personnel) is provided to you as AWS Content under the AWS Customer Agreement, or the relevant written agreement between you and AWS (whichever applies). You should not use this AWS Content in your production accounts, or on production or other critical data. You are responsible for testing, securing, and optimizing the AWS Content, such as sample code, as appropriate for production grade use based on your specific quality control practices and standards. Deploying AWS Content may incur AWS charges for creating or using AWS chargeable resources, such as running Amazon EC2 instances or using Amazon S3 storage.
@@ -9,14 +9,14 @@ The sample code; software libraries; command line tools; proofs of concept; temp
 ![secrets-manager-arch](assets/1-secrets-replication-architecture.png)
 
 At its core, this projects contains a [CDK (AWS Cloud Development Kit)](https://aws.amazon.com/cdk/) script which deploys the following:
-* An Amazon EC2 instance running a demo open-source HashiCorp Vault (3B). You will have access the HCP Vault UI running on the instance to add, update and delete secrets. Adjust the `cdk.json` file if you want to specify your own HCP Vault IP address (3A). 
+* An Amazon EC2 instance running a demo open-source HashiCorp Vault (3B). You will have access the HCP Vault UI running on the instance to add, update and delete secrets. Adjust the `cdk.json` file if you want to specify your own HCP Vault IP address (3A).
 * An initialisation script which sets up the HashiCorp Vault, and adds some sample secrets to it
 * An AWS Lambda function which replicates any new or updated secrets from HashiCorp Vault matching a particular prefix to AWS Secrets Manager
 * A Cron Job in Amazon EventBridge which triggers the Lambda function periodically (default: every 30 minutes)
 * An AWS KMS key for encryption of secrets
 * An optional Amazon SNS topic for email notifications if replication fails
 
-**Note:** Depending on the location of your third-party secrets manager, you may have to consider different networking topologies. For example, you might need to setup a hybrid connection between your on-premises secrets manager and the AWS Cloud if there is no connectivity yet. Although the communication between the replication service shown in this sample and the third-party secrets manager is encrypted using TLS, AWS customers typically setup a hybrid connectivity between their on-premises environment and the AWS Cloud using [AWS Site-to-Site VPN](https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html), and/or [AWS Direct Connect](https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html).
+**Note:** Depending on the location of your third-party secrets manager, you might have to consider different networking topologies. For example, you might need to set up hybrid connectivity between your external environment and the AWS Cloud by using [AWS Site-to-Site VPN](https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html), [AWS Direct Connect](https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html), or both.
 
 ## Getting started
 ### Deploy the solution
@@ -29,8 +29,15 @@ cd SecretsManagerReplication
 Open the project in your favorite IDE and open a terminal in the root folder of the project. If your local environment does not have a terminal that allows you to run these commands, consider using [AWS Cloud9](https://docs.aws.amazon.com/cloud9/latest/user-guide/welcome.html) or [AWS CloudShell](https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html).
 
 #### Important prerequisites
-* You need a valid AWS Access Key ID and Secret Access Key configured, as some of the commands below will interact with your AWS account. See [Configuration basics](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) for more details.
-* You need to have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed for the deployment
+To deploy the solution, the following should be in place on your system:
+1. [Git](https://git-scm.com/downloads)
+2. [Node](https://nodejs.org/en/download/) (version 16 or higher)
+3. [jq](https://stedolan.github.io/jq/download/)
+4. [AWS CDK Toolkit](https://www.npmjs.com/package/aws-cdk). Install using npm (included in Node setup) by running npm install -g aws-cdk in a local terminal.
+5. An AWS access key ID and secret access key configured as this setup will interact with your AWS account. See [Configuration basics](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) in the AWS Command Line Interface User Guide for more details.
+6. You need to have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed **and running** for the deployment
+
+### Deploy the solution
 
 1. Install CDK v2 by running the following command in your terminal:
 ```bash
@@ -40,22 +47,22 @@ npm install -g aws-cdk
 ```bash
 cdk --version
 ```
-3. Install dependencies
+1. Install dependencies
 ```bash
 npm install
 ```
-4. (optional) Adjust any of the default configurations in `cdk.json`:
+1. (optional) Adjust any of the default configurations in `cdk.json`:
    1. `hcpvaultInboundIPCidr`: Default "0.0.0.0/0". Adjust to only allow traffic to your HashiCorp Vault from a specific CIDR range.
    2. `notificationEmail`: Default "". Add an email address to enable email notifications if a replication has failed. Leave as empty string to have no notifications, and don't deploy an Amazon SNS Topic.
    3. `secretsPrefix`: Default "hybrid-aws-secrets". This prefix will be used to identify which secrets should be replicated, adjust to have a custom value for this.
    4. `deployHCPVaultOnEC2`: Default: true. Adjust this boolean value to change whether or not you want to deploy a sample open-source HashiCorp Vault on EC2.
    5. `optionalExternalVaultAddress`: Default: "". If the `deployHCPVaultOnEC2` value is set to `false`, provide an IP address (string) to replicate secrets from an external HashiCorp Vault.
    6. `lambdaCronSchedule`: Default: "cron(0,30 * * * ? *)". Cron expression to trigger the AWS Lambda function periodically following the format defined [here](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-rule-schedule.html)
-5. Bootstrap the CDK environment
+2. Bootstrap the CDK environment
 ```bash
 cdk bootstrap
 ```
-5. Deploy the CDK project
+1. Deploy the CDK project. Make sure that Docker is running on your machine.
 ```bash
 cdk deploy
 ```
