@@ -3,12 +3,11 @@
     "version": "1.0.0",
     "description": "Function to replicate secrets between HashiCorp vault and AWS Secrets Manager",
     "main": "index.js",
-    "scripts": {
-    },
+    "scripts": {},
     "keywords": [],
     "author": "",
     "license": "MIT",
     "dependencies": {
-      "node-vault": "^0.9.22"
+        "node-vault": "^0.12.0"
     }
-  }
+}
